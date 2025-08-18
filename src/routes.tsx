@@ -8,6 +8,7 @@ import Oracoes from "./pages/oracoes/oracoes";
 import TercoDaMisericordia from "./pages/misericordia/misericordia";
 import OracoesEucaristicas from "./pages/selecionarOracao/selecionarOracao";
 import OracaoEucaristicaDynamic from "./pages/oracaoEucaristica/oracaoEcarustica";
+import CreditsPage from "./pages/creditos/credits";
 
 export const PATHS = {
     home: "/",
@@ -19,7 +20,8 @@ export const PATHS = {
     oracoes: "/oracoes",
     misericordia: "/misericordia",
     selecionaroracaoeucaristicas: "/oracoes-eucaristicas",
-    oracaoeucaristica: "/oracao-eucaristica/:id"
+    oracaoeucaristica: "/oracao-eucaristica/:id",
+    credits: "/creditos",
 };
 
 export default function AppRoutes() {
@@ -36,6 +38,7 @@ export default function AppRoutes() {
                 <Route path={PATHS.misericordia} element={<TercoDaMisericordia />} />
                 <Route path={PATHS.selecionaroracaoeucaristicas} element={<OracoesEucaristicas />} />
                 <Route path={PATHS.oracaoeucaristica} element={<OracaoEucaristicaDynamic />} />
+                <Route path={PATHS.credits} element={<CreditsPage />} />
             </Routes>
         </BrowserRouter>
     );
