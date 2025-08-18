@@ -35,6 +35,11 @@ const components = [
         href: "/santo-terco",
         description: "Medite e reze os mistérios do Santo Terço.",
     },
+    {
+        title: "Créditos",
+        href: "/creditos",
+        description: "Agradecimentos a todos que contribuíram para este projeto.",
+    },
 ];
 
 export function Navbar() {
@@ -64,7 +69,7 @@ export function Navbar() {
     ];
 
     return (
-        <header className="w-full border-b bg-background">
+        <header className="w-full border-b bg-background fixed">
             <div className="container mx-auto flex h-16 items-center justify-between px-4">
                 <div className="text-lg font-semibold">
                     <a href="/" className="hover:underline">Liturgia</a>
@@ -138,7 +143,7 @@ export function Navbar() {
 
             {/* Mobile menu */}
             {open && (
-                <div className="md:hidden fixed top-16 left-0 w-full bg-background border-t shadow-lg z-50">
+                <div className="md:hidden fixed top-16 right-0 h-[calc(100vh-4rem)] w-72 bg-background border-r shadow-lg z-50 overflow-y-auto">
                     <ul className="flex flex-col divide-y">
                         <li className="px-6 py-4 font-semibold text-muted-foreground uppercase text-xs">Saiba mais</li>
                         {saibaMaisItems.map((item) => (
