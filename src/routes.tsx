@@ -8,6 +8,9 @@ import Oracoes from "./pages/oracoes/oracoes";
 import TercoDaMisericordia from "./pages/misericordia/misericordia";
 import OracoesEucaristicas from "./pages/selecionarOracao/selecionarOracao";
 import OracaoEucaristicaDynamic from "./pages/oracaoEucaristica/oracaoEcarustica";
+import RitoComunhao from "./pages/ritoComunhao/ritoComunhao";
+import SelecionarNovena from "./pages/novenas/selecionarNovena";
+import Novena from "./pages/novenas/novena";
 import CreditsPage from "./pages/creditos/credits";
 
 export const PATHS = {
@@ -21,6 +24,9 @@ export const PATHS = {
     misericordia: "/misericordia",
     selecionaroracaoeucaristicas: "/oracoes-eucaristicas",
     oracaoeucaristica: "/oracao-eucaristica/:id",
+    ritocomunhao: "/rito-comunhao",
+    novenas: "/novenas",
+    novena: "/novena/:id",
     credits: "/creditos",
 };
 
@@ -38,6 +44,9 @@ export default function AppRoutes() {
                 <Route path={PATHS.misericordia} element={<TercoDaMisericordia />} />
                 <Route path={PATHS.selecionaroracaoeucaristicas} element={<OracoesEucaristicas />} />
                 <Route path={PATHS.oracaoeucaristica} element={<OracaoEucaristicaDynamic />} />
+                <Route path={PATHS.ritocomunhao} element={<RitoComunhao />} />
+                <Route path={PATHS.novenas} element={<SelecionarNovena />} />
+                <Route path={PATHS.novena} element={<Novena />} />
                 <Route path={PATHS.credits} element={<CreditsPage />} />
             </Routes>
         </BrowserRouter>

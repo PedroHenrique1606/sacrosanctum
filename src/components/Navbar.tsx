@@ -25,6 +25,12 @@ const components = [
             "Reze com orações tradicionais, novenas, terços e devoções populares da Igreja Católica.",
     },
     {
+        title: "Novenas e Devoções",
+        href: "/novenas",
+        description:
+            "Novenas aos santos e devoções tradicionais da Igreja Católica.",
+    },
+    {
         title: "Calendário Litúrgico",
         href: "/calendario-liturgico",
         description:
@@ -39,6 +45,19 @@ const components = [
         title: "Créditos",
         href: "/creditos",
         description: "Agradecimentos a todos que contribuíram para este projeto.",
+    },
+];
+
+const liturgiaMissaItems = [
+    {
+        title: "Orações Eucarísticas",
+        href: "/oracoes-eucaristicas",
+        description: "Acompanhe as orações eucarísticas da Santa Missa.",
+    },
+    {
+        title: "Rito da Comunhão",
+        href: "/rito-comunhao",
+        description: "Acompanhe o Rito da Comunhão da Santa Missa.",
     },
 ];
 
@@ -57,11 +76,6 @@ export function Navbar() {
             description: "Prepare-se para uma boa confissão.",
         },
         {
-            title: "Orações Eucarísticas",
-            href: "/oracoes-eucaristicas",
-            description: "Acompanhe a oração eucarística da Santa Missa.",
-        },
-        {
             title: "Terço da Misericórdia",
             href: "/misericordia",
             description: "Reze o Terço da Misericórdia.",
@@ -69,7 +83,7 @@ export function Navbar() {
     ];
 
     return (
-        <header className="w-full border-b bg-background fixed">
+        <header className="w-full border-b bg-background fixed top-0 z-50">
             <div className="container mx-auto flex h-16 items-center justify-between px-4">
                 <div className="text-lg font-semibold">
                     <a href="/" className="hover:underline">Liturgia</a>
@@ -86,10 +100,10 @@ export function Navbar() {
                                         <li className="row-span-3">
                                             <NavigationMenuLink asChild>
                                                 <a
-                                                    className="relative flex h-full w-full select-none flex-col justify-end overflow-hidden rounded-md bg-cover bg-center bg-[url(./assets/pope-leone.png)] outline-none"
+                                                    className="relative flex h-full w-full select-none flex-col justify-end overflow-hidden rounded-md bg-cover bg-top bg-[url(./assets/pope-leone.png)] outline-none"
                                                     href="/pontifex"
                                                 >
-                                                    <div className="absolute inset-0 bg-black/25 z-0" />
+                                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-0" />
                                                     <div className="mb-2 mt-4 px-6 text-lg font-medium text-white z-10">
                                                         Papa Leão XIV
                                                     </div>
@@ -101,6 +115,23 @@ export function Navbar() {
                                         </li>
                                         {saibaMaisItems.slice(1).map((item) => (
                                             <NavListItem key={item.title} href={item.href} title={item.title}>
+                                                {item.description}
+                                            </NavListItem>
+                                        ))}
+                                    </ul>
+                                </NavigationMenuContent>
+                            </NavigationMenuItem>
+
+                            <NavigationMenuItem>
+                                <NavigationMenuTrigger>Liturgia da Missa</NavigationMenuTrigger>
+                                <NavigationMenuContent>
+                                    <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] lg:w-[600px]">
+                                        {liturgiaMissaItems.map((item) => (
+                                            <NavListItem
+                                                key={item.title}
+                                                title={item.title}
+                                                href={item.href}
+                                            >
                                                 {item.description}
                                             </NavListItem>
                                         ))}
@@ -143,37 +174,57 @@ export function Navbar() {
 
             {/* Mobile menu */}
             {open && (
-                <div className="md:hidden fixed top-16 right-0 h-[calc(100vh-4rem)] w-72 bg-background border-r shadow-lg z-50 overflow-y-auto">
-                    <ul className="flex flex-col divide-y">
-                        <li className="px-6 py-4 font-semibold text-muted-foreground uppercase text-xs">Saiba mais</li>
-                        {saibaMaisItems.map((item) => (
-                            <li key={item.title}>
-                                <a
-                                    href={item.href}
-                                    className="block px-6 py-3 text-base font-medium hover:bg-accent"
-                                    onClick={() => setOpen(false)}
-                                >
-                                    {item.title}
-                                    <p className="text-sm text-muted-foreground">{item.description}</p>
-                                </a>
-                            </li>
-                        ))}
+                <>
+                    <div 
+                        className="md:hidden fixed inset-0 top-16 bg-black/50 z-30"
+                        onClick={() => setOpen(false)}
+                    />
+                    <div className="md:hidden fixed top-16 right-0 h-[calc(100vh-4rem)] w-80 max-w-[85vw] bg-background border-l shadow-2xl z-40 overflow-y-auto">
+                        <ul className="flex flex-col divide-y">
+                            <li className="px-6 py-4 font-semibold text-muted-foreground uppercase text-xs">Saiba mais</li>
+                            {saibaMaisItems.map((item) => (
+                                <li key={item.title}>
+                                    <a
+                                        href={item.href}
+                                        className="block px-6 py-3 text-base font-medium hover:bg-accent transition-colors"
+                                        onClick={() => setOpen(false)}
+                                    >
+                                        {item.title}
+                                        <p className="text-sm text-muted-foreground mt-1">{item.description}</p>
+                                    </a>
+                                </li>
+                            ))}
 
-                        <li className="px-6 py-4 font-semibold text-muted-foreground uppercase text-xs">Reze</li>
-                        {components.map((item) => (
-                            <li key={item.title}>
-                                <a
-                                    href={item.href}
-                                    className="block px-6 py-3 text-base font-medium hover:bg-accent"
-                                    onClick={() => setOpen(false)}
-                                >
-                                    {item.title}
-                                    <p className="text-sm text-muted-foreground">{item.description}</p>
-                                </a>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
+                            <li className="px-6 py-4 font-semibold text-muted-foreground uppercase text-xs">Liturgia da Missa</li>
+                            {liturgiaMissaItems.map((item) => (
+                                <li key={item.title}>
+                                    <a
+                                        href={item.href}
+                                        className="block px-6 py-3 text-base font-medium hover:bg-accent transition-colors"
+                                        onClick={() => setOpen(false)}
+                                    >
+                                        {item.title}
+                                        <p className="text-sm text-muted-foreground mt-1">{item.description}</p>
+                                    </a>
+                                </li>
+                            ))}
+
+                            <li className="px-6 py-4 font-semibold text-muted-foreground uppercase text-xs">Reze</li>
+                            {components.map((item) => (
+                                <li key={item.title}>
+                                    <a
+                                        href={item.href}
+                                        className="block px-6 py-3 text-base font-medium hover:bg-accent transition-colors"
+                                        onClick={() => setOpen(false)}
+                                    >
+                                        {item.title}
+                                        <p className="text-sm text-muted-foreground mt-1">{item.description}</p>
+                                    </a>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                </>
             )}
         </header>
     );

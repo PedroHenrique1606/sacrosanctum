@@ -10,30 +10,84 @@ export default function CreditsPage() {
     const [form, setForm] = useState({ name: "", suggestion: "" })
     const [sending, setSending] = useState(false)
     const [sent, setSent] = useState(false)
+    const [error, setError] = useState("")
+
+    const sanitizeInput = (input: string): string => {
+        return input
+            .replace(/[<>]/g, "")
+            .replace(/javascript:/gi, "")
+            .replace(/on\w+=/gi, "")
+            .replace(/<script[^>]*>.*?<\/script>/gi, "")
+    }
+
+    const validateInput = (name: string, suggestion: string): boolean => {
+        const dangerousPatterns = [
+            /<script/i,
+            /javascript:/i,
+            /on\w+=/i,
+            /<iframe/i,
+            /<object/i,
+            /<embed/i,
+            /eval\(/i,
+            /expression\(/i
+        ]
+
+        const combinedText = name + suggestion
+
+        for (const pattern of dangerousPatterns) {
+            if (pattern.test(combinedText)) {
+                return false
+            }
+        }
+
+        if (name.length > 100 || suggestion.length > 1000) {
+            return false
+        }
+
+        return true
+    }
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        setForm({ ...form, [e.target.name]: e.target.value })
+        const sanitized = sanitizeInput(e.target.value)
+        setForm({ ...form, [e.target.name]: sanitized })
+        setError("")
     }
 
     const handleSubmit = async () => {
+        const trimmedName = form.name.trim()
+        const trimmedSuggestion = form.suggestion.trim()
+
+        if (!trimmedName || !trimmedSuggestion) {
+            setError("Por favor, preencha todos os campos.")
+            return
+        }
+
+        if (!validateInput(trimmedName, trimmedSuggestion)) {
+            setError("Por favor, insira apenas texto válido. Não são permitidos códigos ou caracteres especiais.")
+            return
+        }
+
         setSending(true)
+        setError("")
         try {
             const response = await fetch("https://formspree.io/f/xnnvekea", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    name: form.name,
-                    message: form.suggestion,
+                    name: sanitizeInput(trimmedName),
+                    message: sanitizeInput(trimmedSuggestion),
                     email: "pedromelo.dev.contato@gmail.com"
                 }),
             })
             if (response.ok) {
                 setSent(true)
+                setForm({ name: "", suggestion: "" })
             } else {
                 throw new Error("Erro ao enviar")
             }
         } catch (error) {
             console.error("Erro ao enviar:", error)
+            setError("Erro ao enviar sugestão. Tente novamente mais tarde.")
         } finally {
             setSending(false)
         }
@@ -68,6 +122,13 @@ export default function CreditsPage() {
                         </p>
                     ) : (
                         <form onSubmit={(e) => { e.preventDefault(); handleSubmit() }} className="space-y-4">
+                            {error && (
+                                <div className="bg-red-50 dark:bg-red-950/20 border-l-4 border-red-500 p-4 rounded-r-lg">
+                                    <p className="text-sm text-red-900 dark:text-red-300">
+                                        {error}
+                                    </p>
+                                </div>
+                            )}
                             <div className="space-y-2">
                                 <Label htmlFor="name">Seu nome</Label>
                                 <Input
@@ -77,7 +138,11 @@ export default function CreditsPage() {
                                     onChange={handleChange}
                                     required
                                     placeholder="Digite seu nome"
+                                    maxLength={100}
                                 />
+                                <p className="text-xs text-muted-foreground">
+                                    Máximo 100 caracteres
+                                </p>
                             </div>
                             <div className="space-y-2">
                                 <Label htmlFor="suggestion">Sua sugestão</Label>
@@ -89,7 +154,11 @@ export default function CreditsPage() {
                                     required
                                     placeholder="Ex: Seria legal ter um devocionário..."
                                     className="min-h-[120px]"
+                                    maxLength={1000}
                                 />
+                                <p className="text-xs text-muted-foreground">
+                                    {form.suggestion.length}/1000 caracteres
+                                </p>
                             </div>
                             <Button type="submit" disabled={sending} className="w-full">
                                 {sending ? (
