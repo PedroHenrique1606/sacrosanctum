@@ -21,7 +21,6 @@ export default function Oracoes() {
                             className="hover:shadow-xl transition-all duration-300 cursor-pointer"
                         >
                             <CardContent className="p-4 flex items-center gap-2">
-                                <span className="text-xl">📜</span>
                                 <h2 className="text-lg font-medium text-primary">{prayer.title}</h2>
                             </CardContent>
                         </Card>

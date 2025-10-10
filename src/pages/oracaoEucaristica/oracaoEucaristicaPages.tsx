@@ -30,23 +30,44 @@ export function OracaoEucaristicaPage({
             )}
 
             <div className="space-y-4 text-justify leading-relaxed">
-                {texto.map((par, idx) => (
-                    <div key={idx} className="space-y-2">
-                        {par.split('\n').map((linha, subIdx) => {
-                            const isVariação = linha.trim().toLowerCase().startsWith('variações:');
+                {texto.map((par, idx) => {
+                    const isRubricaBlock = par.trim().startsWith('[Rúbrica Litúrgica]');
 
-                            return (
-                                <p
-                                    key={subIdx}
-                                    className={`whitespace-pre-wrap ${isVariação ? 'font-semibold text-red-500' : ''
-                                        }`}
-                                >
-                                    {linha}
+                    if (isRubricaBlock) {
+                        const conteudo = par.replace('[Rúbrica Litúrgica]', '').trim();
+                        return (
+                            <div
+                                key={idx}
+                                className="bg-amber-50 dark:bg-amber-950/30 border-l-4 border-amber-500 p-4 rounded-r-lg my-6"
+                            >
+                                <p className="text-sm font-semibold text-amber-800 dark:text-amber-400 mb-3">
+                                    Rúbrica Litúrgica
                                 </p>
-                            );
-                        })}
-                    </div>
-                ))}
+                                <p className="text-sm text-amber-900 dark:text-amber-300 leading-relaxed italic whitespace-pre-line">
+                                    {conteudo}
+                                </p>
+                            </div>
+                        );
+                    }
+
+                    return (
+                        <div key={idx} className="space-y-2">
+                            {par.split('\n').map((linha, subIdx) => {
+                                const isVariação = linha.trim().toLowerCase().startsWith('variações:');
+
+                                return (
+                                    <p
+                                        key={subIdx}
+                                        className={`whitespace-pre-wrap ${isVariação ? 'font-semibold text-red-500' : ''
+                                            }`}
+                                    >
+                                        {linha}
+                                    </p>
+                                );
+                            })}
+                        </div>
+                    );
+                })}
             </div>
         </div>
     );
