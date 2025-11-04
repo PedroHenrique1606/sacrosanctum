@@ -107,7 +107,7 @@ export default function CreditsPage() {
                         <ul className="space-y-1 text-muted-foreground">
                             <li><Heart className="inline w-4 h-4 mr-1 text-pink-500" /> Pedro Henrique Melo – Desenvolvimento</li>
                             <li><Heart className="inline w-4 h-4 mr-1 text-pink-500" /> Danyel – API de liturgia</li>
-                            <li><Heart className="inline w-4 h-4 mr-1 text-pink-500" /> Diácono Maxsuwel – Revisão Pastoral</li>
+                            <li><Heart className="inline w-4 h-4 mr-1 text-pink-500" /> Padre Maxsuwel – Revisão Pastoral</li>
                         </ul>
                     </div>
                 </CardContent>

@@ -125,14 +125,14 @@ export default function ManualConfissao() {
                                     </a>
 
                                     <a
-                                        href="https://instagram.com/diaconomaxsuweloliveira"
+                                        href="https://www.instagram.com/padremaxsuwel"
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="flex items-center gap-3 p-4 rounded-md border bg-transparent hover:bg-white/5 transition"
                                     >
                                         <Instagram className="w-5 h-5 text-primary" />
                                         <div>
-                                            <p className="font-semibold text-primary">Diácono Maxsuwel Oliveira</p>
+                                            <p className="font-semibold text-primary">Padre Maxsuwel Oliveira</p>
                                             <p className="text-xs text-primary">Revisão Pastoral</p>
                                         </div>
                                     </a>
