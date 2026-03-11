@@ -185,68 +185,77 @@ export default function PrayRosaryPage() {
 
     return (
         <div className="min-h-screen bg-background pt-16">
-            <div className="max-w-5xl mx-auto py-12 px-4 space-y-10">
-                <div className="text-center space-y-3">
-                    <h1 className="text-4xl md:text-5xl font-bold font-serif">Santo Terço</h1>
-                    <p className="text-base text-muted-foreground capitalize">
-                        {day} • {allMysteries[currentMystery].title}
+            <div className="max-w-4xl mx-auto py-8 md:py-12 px-4 space-y-12">
+                {/* Hero */}
+                <header className="text-center space-y-4">
+                    <h1 className="text-4xl md:text-5xl font-bold font-serif tracking-tight text-foreground">
+                        Santo Terço
+                    </h1>
+                    <p className="text-muted-foreground max-w-xl mx-auto text-sm md:text-base">
+                        Meditação dos mistérios da vida de Jesus e de Maria, em união com a Igreja.
                     </p>
-                </div>
+                    <div className="inline-flex flex-wrap items-center justify-center gap-2 text-sm">
+                        <span className="capitalize text-muted-foreground">{day}</span>
+                        <span className="text-muted-foreground/60" aria-hidden>·</span>
+                        <span className={`font-semibold px-3 py-1.5 rounded-full ${getMysteryBgColor(currentMystery)} shadow-sm`}>
+                            {allMysteries[currentMystery].title}
+                        </span>
+                    </div>
+                </header>
 
                 <Tabs value={currentMystery} onValueChange={(val) => setCurrentMystery(val as keyof typeof allMysteries)} className="space-y-8">
-                    <TabsList className="grid grid-cols-4 w-full max-w-3xl mx-auto">
-                        <TabsTrigger value="Luz">Luz</TabsTrigger>
-                        <TabsTrigger value="Gozosos">Gozosos</TabsTrigger>
-                        <TabsTrigger value="Dolorosos">Dolorosos</TabsTrigger>
-                        <TabsTrigger value="Gloriosos">Gloriosos</TabsTrigger>
+                    <TabsList className="grid grid-cols-4 w-full max-w-2xl mx-auto h-11 bg-muted/50 p-1 rounded-lg">
+                        <TabsTrigger value="Luz" className="rounded-md text-sm font-medium data-[state=active]:shadow-sm">Luz</TabsTrigger>
+                        <TabsTrigger value="Gozosos" className="rounded-md text-sm font-medium data-[state=active]:shadow-sm">Gozosos</TabsTrigger>
+                        <TabsTrigger value="Dolorosos" className="rounded-md text-sm font-medium data-[state=active]:shadow-sm">Dolorosos</TabsTrigger>
+                        <TabsTrigger value="Gloriosos" className="rounded-md text-sm font-medium data-[state=active]:shadow-sm">Gloriosos</TabsTrigger>
                     </TabsList>
 
                     {Object.entries(allMysteries).map(([key, group]) => (
-                        <TabsContent value={key} key={key} className="space-y-6">
+                        <TabsContent value={key} key={key} className="space-y-6 mt-8">
                             <motion.div
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                animate={{ opacity: 1, scale: 1 }}
+                                initial={{ opacity: 0, y: 8 }}
+                                animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.3 }}
+                                className={`rounded-xl border ${getMysteryBorderColor(key)} bg-card overflow-hidden`}
                             >
-                                <Card className={`border-l-4 ${getMysteryBorderColor(key)}`}>
-                                    <CardHeader className={getMysteryBgColor(key)}>
-                                        <h2 className="text-2xl font-bold">{group.title}</h2>
-                                        <p className="text-sm text-muted-foreground">
-                                            Medite nos mistérios enquanto reza o Santo Terço
-                                        </p>
-                                    </CardHeader>
-                                </Card>
+                                <div className={`px-6 py-5 ${getMysteryBgColor(key)}`}>
+                                    <h2 className="text-xl font-bold tracking-tight">{group.title}</h2>
+                                    <p className="text-sm text-muted-foreground mt-1">
+                                        Medite cada mistério enquanto reza as dez Ave-Marias
+                                    </p>
+                                </div>
                             </motion.div>
 
-                            <div className="space-y-4">
+                            <div className="space-y-3">
                                 {group.mysteries.map((m, idx) => (
                                     <motion.div
                                         key={idx}
-                                        initial={{ opacity: 0, x: -20 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        transition={{ duration: 0.3, delay: idx * 0.1 }}
+                                        initial={{ opacity: 0, y: 8 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ duration: 0.25, delay: idx * 0.05 }}
                                     >
-                                        <Card className={`border-l-4 ${getMysteryBorderColor(key)} hover:shadow-md transition-all`}>
+                                        <Card className={`border-l-4 ${getMysteryBorderColor(key)} overflow-hidden transition-shadow hover:shadow-md`}>
                                             <Accordion type="single" collapsible>
                                                 <AccordionItem value={`mystery-${idx}`} className="border-0">
-                                                    <AccordionTrigger className="px-6 py-4 hover:no-underline">
-                                                        <div className="flex items-center gap-3 text-left">
-                                                            <div className={`flex-shrink-0 w-8 h-8 rounded-full ${getMysteryBgColor(key)} flex items-center justify-center font-bold text-sm`}>
+                                                    <AccordionTrigger className="px-5 py-4 hover:no-underline hover:bg-muted/30 [&[data-state=open]]:bg-muted/30">
+                                                        <div className="flex items-center gap-4 text-left">
+                                                            <span className={`flex-shrink-0 w-9 h-9 rounded-full ${getMysteryBgColor(key)} border-2 border-background flex items-center justify-center font-bold text-sm shadow-sm`}>
                                                                 {idx + 1}
-                                                            </div>
-                                                            <span className="font-semibold">{m.title}</span>
+                                                            </span>
+                                                            <span className="font-semibold text-base leading-snug">{m.title}</span>
                                                         </div>
                                                     </AccordionTrigger>
-                                                    <AccordionContent className="px-6 pb-6">
-                                                        <div className="space-y-4 pt-2">
-                                                            <div className={`${getMysteryBgColor(key)} rounded-lg p-4`}>
-                                                                <p className="text-sm font-semibold mb-2">Contemplação</p>
+                                                    <AccordionContent className="px-5 pb-5 pt-0">
+                                                        <div className="space-y-5">
+                                                            <section className={`${getMysteryBgColor(key)} rounded-lg p-4`}>
+                                                                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Contemplação</p>
                                                                 <p className="text-sm leading-relaxed">{m.contemplation}</p>
-                                                            </div>
-                                                            <div className="border-l-2 border-muted pl-4">
-                                                                <p className="text-sm font-semibold mb-2 text-muted-foreground">Passagem Bíblica</p>
-                                                                <p className="text-sm italic text-muted-foreground leading-relaxed">{m.verse}</p>
-                                                            </div>
+                                                            </section>
+                                                            <section className="border-l-2 border-primary/30 pl-4">
+                                                                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Passagem bíblica</p>
+                                                                <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">{m.verse}</p>
+                                                            </section>
                                                         </div>
                                                     </AccordionContent>
                                                 </AccordionItem>
@@ -259,123 +268,121 @@ export default function PrayRosaryPage() {
                     ))}
                 </Tabs>
 
-                <div className="mt-12 space-y-8">
-                    <div className="text-center">
-                        <h2 className="text-3xl font-bold font-serif mb-2">Como Rezar o Terço</h2>
-                        <p className="text-muted-foreground">Guia completo para rezar o Santo Terço</p>
-                    </div>
+                {/* Como Rezar */}
+                <section className="space-y-8 pt-4 border-t border-border/60">
+                    <header className="text-center space-y-2">
+                        <h2 className="text-2xl md:text-3xl font-bold font-serif tracking-tight">Como Rezar o Terço</h2>
+                        <p className="text-muted-foreground text-sm md:text-base">Estrutura do terço em três momentos</p>
+                    </header>
 
-                    <div className="grid md:grid-cols-3 gap-6">
-                        <Card className="border-primary/20">
-                            <CardHeader className="bg-primary/5">
-                                <h3 className="text-lg font-bold">Início</h3>
+                    <div className="grid md:grid-cols-3 gap-5">
+                        <Card className="border border-border/60 overflow-hidden">
+                            <CardHeader className="bg-muted/40 py-4">
+                                <h3 className="text-base font-bold">Início</h3>
                             </CardHeader>
-                            <CardContent className="pt-6">
-                                <ol className="space-y-4 text-sm">
+                            <CardContent className="pt-4 pb-5">
+                                <ol className="space-y-3 text-sm">
                                     <li className="flex gap-3">
-                                        <span className="flex-shrink-0 font-bold text-primary">1.</span>
+                                        <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary text-xs">1</span>
                                         <div>
-                                            <p className="font-semibold mb-1">Sinal da Cruz</p>
-                                            <p className="text-muted-foreground text-xs">Em nome do Pai, do Filho e do Espírito Santo</p>
+                                            <p className="font-semibold">Sinal da Cruz</p>
+                                            <p className="text-muted-foreground text-xs mt-0.5">Em nome do Pai, do Filho e do Espírito Santo</p>
                                         </div>
                                     </li>
                                     <li className="flex gap-3">
-                                        <span className="flex-shrink-0 font-bold text-primary">2.</span>
+                                        <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary text-xs">2</span>
                                         <div>
-                                            <p className="font-semibold mb-1">Creio em Deus Pai</p>
-                                            <p className="text-muted-foreground text-xs">Profissão de fé</p>
+                                            <p className="font-semibold">Creio em Deus Pai</p>
+                                            <p className="text-muted-foreground text-xs mt-0.5">Profissão de fé</p>
                                         </div>
                                     </li>
                                     <li className="flex gap-3">
-                                        <span className="flex-shrink-0 font-bold text-primary">3.</span>
+                                        <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary text-xs">3</span>
                                         <div>
-                                            <p className="font-semibold mb-1">1 Pai Nosso</p>
-                                            <p className="text-muted-foreground text-xs">Na conta grande</p>
+                                            <p className="font-semibold">1 Pai Nosso</p>
+                                            <p className="text-muted-foreground text-xs mt-0.5">Na conta grande</p>
                                         </div>
                                     </li>
                                     <li className="flex gap-3">
-                                        <span className="flex-shrink-0 font-bold text-primary">4.</span>
+                                        <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary text-xs">4</span>
                                         <div>
-                                            <p className="font-semibold mb-1">3 Ave Marias</p>
-                                            <p className="text-muted-foreground text-xs">Nas contas pequenas</p>
+                                            <p className="font-semibold">3 Ave Marias</p>
+                                            <p className="text-muted-foreground text-xs mt-0.5">Nas contas pequenas</p>
                                         </div>
                                     </li>
                                     <li className="flex gap-3">
-                                        <span className="flex-shrink-0 font-bold text-primary">5.</span>
+                                        <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary text-xs">5</span>
                                         <div>
-                                            <p className="font-semibold mb-1">1 Glória ao Pai</p>
-                                            <p className="text-muted-foreground text-xs">Antes dos mistérios</p>
+                                            <p className="font-semibold">1 Glória ao Pai</p>
+                                            <p className="text-muted-foreground text-xs mt-0.5">Antes dos mistérios</p>
                                         </div>
                                     </li>
                                 </ol>
                             </CardContent>
                         </Card>
 
-                        <Card className="border-primary/20">
-                            <CardHeader className="bg-primary/5">
-                                <h3 className="text-lg font-bold">Cada Mistério</h3>
+                        <Card className="border border-border/60 overflow-hidden">
+                            <CardHeader className="bg-muted/40 py-4">
+                                <h3 className="text-base font-bold">Cada Mistério</h3>
                             </CardHeader>
-                            <CardContent className="pt-6">
-                                <div className="space-y-4 text-sm">
-                                    <p className="text-muted-foreground mb-4">Repita 5 vezes (uma para cada mistério):</p>
-                                    <ol className="space-y-3">
-                                        <li className="flex gap-3">
-                                            <span className="flex-shrink-0 font-bold text-primary">•</span>
-                                            <p>Anunciar o mistério</p>
-                                        </li>
-                                        <li className="flex gap-3">
-                                            <span className="flex-shrink-0 font-bold text-primary">•</span>
-                                            <p>1 Pai Nosso</p>
-                                        </li>
-                                        <li className="flex gap-3">
-                                            <span className="flex-shrink-0 font-bold text-primary">•</span>
-                                            <p>10 Ave Marias</p>
-                                        </li>
-                                        <li className="flex gap-3">
-                                            <span className="flex-shrink-0 font-bold text-primary">•</span>
-                                            <p>1 Glória ao Pai</p>
-                                        </li>
-                                        <li className="flex gap-3">
-                                            <span className="flex-shrink-0 font-bold text-primary">•</span>
-                                            <p>Jaculatória</p>
-                                        </li>
-                                    </ol>
-                                </div>
+                            <CardContent className="pt-4 pb-5">
+                                <p className="text-muted-foreground text-sm mb-4">Repita 5 vezes (um por mistério):</p>
+                                <ul className="space-y-2.5 text-sm">
+                                    <li className="flex gap-3">
+                                        <span className="flex-shrink-0 w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs">•</span>
+                                        <span>Anunciar o mistério</span>
+                                    </li>
+                                    <li className="flex gap-3">
+                                        <span className="flex-shrink-0 w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs">•</span>
+                                        <span>1 Pai Nosso</span>
+                                    </li>
+                                    <li className="flex gap-3">
+                                        <span className="flex-shrink-0 w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs">•</span>
+                                        <span>10 Ave Marias</span>
+                                    </li>
+                                    <li className="flex gap-3">
+                                        <span className="flex-shrink-0 w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs">•</span>
+                                        <span>1 Glória ao Pai</span>
+                                    </li>
+                                    <li className="flex gap-3">
+                                        <span className="flex-shrink-0 w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs">•</span>
+                                        <span>Jaculatória</span>
+                                    </li>
+                                </ul>
                             </CardContent>
                         </Card>
 
-                        <Card className="border-primary/20">
-                            <CardHeader className="bg-primary/5">
-                                <h3 className="text-lg font-bold">Conclusão</h3>
+                        <Card className="border border-border/60 overflow-hidden">
+                            <CardHeader className="bg-muted/40 py-4">
+                                <h3 className="text-base font-bold">Conclusão</h3>
                             </CardHeader>
-                            <CardContent className="pt-6">
-                                <ol className="space-y-4 text-sm">
+                            <CardContent className="pt-4 pb-5">
+                                <ol className="space-y-3 text-sm">
                                     <li className="flex gap-3">
-                                        <span className="flex-shrink-0 font-bold text-primary">6.</span>
+                                        <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary text-xs">6</span>
                                         <div>
-                                            <p className="font-semibold mb-1">Salve Rainha</p>
-                                            <p className="text-muted-foreground text-xs">Oração final mariana</p>
+                                            <p className="font-semibold">Salve Rainha</p>
+                                            <p className="text-muted-foreground text-xs mt-0.5">Oração final mariana</p>
                                         </div>
                                     </li>
                                 </ol>
-                                <div className="mt-6 pt-6 border-t">
-                                    <p className="text-xs text-muted-foreground italic">
-                                        O terço completo contém aproximadamente 60 orações e leva cerca de 15-20 minutos para ser rezado.
-                                    </p>
-                                </div>
+                                <p className="mt-5 pt-4 border-t border-border/60 text-xs text-muted-foreground italic leading-relaxed">
+                                    O terço completo tem cerca de 15–20 minutos de oração.
+                                </p>
                             </CardContent>
                         </Card>
                     </div>
 
-                    <Card className="border-l-4 border-l-primary">
-                        <CardHeader>
+                    {/* Orações */}
+                    <Card className="border border-border/60 overflow-hidden">
+                        <CardHeader className="bg-muted/30 py-5">
                             <h3 className="text-xl font-bold">Orações do Terço</h3>
-                            <p className="text-sm text-muted-foreground">Clique para ver o texto completo de cada oração</p>
+                            <p className="text-sm text-muted-foreground mt-1">Toque para expandir e ver o texto completo</p>
                         </CardHeader>
-                        <CardContent>
+                        <CardContent className="pt-4 pb-6">
                             <Accordion type="single" collapsible className="space-y-3">
                                 <AccordionItem value="credo" className="border rounded-lg">
-                                    <AccordionTrigger className="px-4 hover:no-underline">
+                                    <AccordionTrigger className="px-4 py-3 hover:no-underline rounded-lg">
                                         <span className="font-semibold">Creio em Deus Pai (Credo)</span>
                                     </AccordionTrigger>
                                     <AccordionContent className="px-4 pb-4">
@@ -388,7 +395,7 @@ export default function PrayRosaryPage() {
                                 </AccordionItem>
 
                                 <AccordionItem value="pai-nosso" className="border rounded-lg">
-                                    <AccordionTrigger className="px-4 hover:no-underline">
+                                    <AccordionTrigger className="px-4 py-3 hover:no-underline rounded-lg">
                                         <span className="font-semibold">Pai Nosso</span>
                                     </AccordionTrigger>
                                     <AccordionContent className="px-4 pb-4">
@@ -401,7 +408,7 @@ export default function PrayRosaryPage() {
                                 </AccordionItem>
 
                                 <AccordionItem value="ave-maria" className="border rounded-lg">
-                                    <AccordionTrigger className="px-4 hover:no-underline">
+                                    <AccordionTrigger className="px-4 py-3 hover:no-underline rounded-lg">
                                         <span className="font-semibold">Ave Maria</span>
                                     </AccordionTrigger>
                                     <AccordionContent className="px-4 pb-4">
@@ -414,7 +421,7 @@ export default function PrayRosaryPage() {
                                 </AccordionItem>
 
                                 <AccordionItem value="gloria" className="border rounded-lg">
-                                    <AccordionTrigger className="px-4 hover:no-underline">
+                                    <AccordionTrigger className="px-4 py-3 hover:no-underline rounded-lg">
                                         <span className="font-semibold">Glória ao Pai</span>
                                     </AccordionTrigger>
                                     <AccordionContent className="px-4 pb-4">
@@ -427,7 +434,7 @@ export default function PrayRosaryPage() {
                                 </AccordionItem>
 
                                 <AccordionItem value="jaculatoria" className="border rounded-lg">
-                                    <AccordionTrigger className="px-4 hover:no-underline">
+                                    <AccordionTrigger className="px-4 py-3 hover:no-underline rounded-lg">
                                         <span className="font-semibold">Jaculatória (Oração de Fátima)</span>
                                     </AccordionTrigger>
                                     <AccordionContent className="px-4 pb-4">
@@ -440,7 +447,7 @@ export default function PrayRosaryPage() {
                                 </AccordionItem>
 
                                 <AccordionItem value="jaculatoria-final" className="border rounded-lg">
-                                    <AccordionTrigger className="px-4 hover:no-underline">
+                                    <AccordionTrigger className="px-4 py-3 hover:no-underline rounded-lg">
                                         <span className="font-semibold">Jaculatória Final (Opcional)</span>
                                     </AccordionTrigger>
                                     <AccordionContent className="px-4 pb-4">
@@ -453,7 +460,7 @@ export default function PrayRosaryPage() {
                                 </AccordionItem>
 
                                 <AccordionItem value="salve-rainha" className="border rounded-lg">
-                                    <AccordionTrigger className="px-4 hover:no-underline">
+                                    <AccordionTrigger className="px-4 py-3 hover:no-underline rounded-lg">
                                         <span className="font-semibold">Salve Rainha</span>
                                     </AccordionTrigger>
                                     <AccordionContent className="px-4 pb-4">
@@ -467,7 +474,7 @@ export default function PrayRosaryPage() {
                             </Accordion>
                         </CardContent>
                     </Card>
-                </div>
+                </section>
             </div>
         </div>
     )

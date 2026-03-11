@@ -543,9 +543,37 @@ function Liturgia() {
                       </span>
                     </div>
                   )}
-                  <h2 className="text-lg font-semibold mb-2">1ª Leitura {leitura.referencia}</h2>
-                  <p className="italic mb-2">{leitura.titulo}</p>
-                  <p className="leading-relaxed whitespace-pre-line">{leitura.texto}</p>
+                  <div className="text-center mb-4">
+                    <h2 className="text-xl font-bold text-primary uppercase">Primeira Leitura</h2>
+                  </div>
+                  <div className="text-right mb-4">
+                    <p className="italic text-sm text-muted-foreground">{leitura.titulo}</p>
+                  </div>
+                  <div className="mb-4">
+                    <p className="text-sm">
+                      <span className="text-primary">Leitura da {leitura.titulo.replace('Leitura do ', '')} </span>
+                      <span className="text-primary font-semibold">{leitura.referencia}</span>
+                    </p>
+                  </div>
+                  <div className="space-y-3">
+                    {leitura.texto.split('\n').map((paragrafo, i) => {
+                      const trimmed = paragrafo.trim();
+                      if (!trimmed) return null;
+                      const match = trimmed.match(/^(\d+(?:,\d+)?(?:-\d+)?(?:[a-z])?)\s*(.*)/);
+                      if (match) {
+                        const [, numero, texto] = match;
+                        return (
+                          <div key={i} className="flex">
+                            <span className="text-primary font-semibold mr-3 flex-shrink-0">{numero}</span>
+                            <p className="leading-relaxed">{texto}</p>
+                          </div>
+                        );
+                      }
+                      return (
+                        <p key={i} className="leading-relaxed">{trimmed}</p>
+                      );
+                    })}
+                  </div>
                   <p className="mt-4 font-semibold pb-2">— Palavra do Senhor.</p>
                   <p>— Graças a Deus.</p>
                 </div>
@@ -673,24 +701,47 @@ function Liturgia() {
                         </span>
                       </div>
                     )}
-                    <h2 className="text-lg font-semibold mb-2">Evangelho {evangelho.referencia}</h2>
-                    <div className={`${fontSize}`}>
-                      <p className="italic mb-2">
+                    <div className="text-center mb-4">
+                      <h2 className="text-xl font-bold text-primary uppercase">Evangelho</h2>
+                    </div>
+                    <div className="text-right mb-4">
+                      <p className="italic text-sm text-muted-foreground">
                         {evangelho.titulo.split(/(✠)/g).map((parte, idx) =>
                           parte === '✠' ? (
-                            <span key={idx} className="text-red-800 font-bold">{parte}</span>
+                            <span key={idx} className="text-red-600 dark:text-red-400 font-bold">{parte}</span>
                           ) : (
                             <span key={idx}>{parte}</span>
                           )
                         )}
                       </p>
-                      {!isPaixao && <p>— Glória a vós, Senhor.</p>}
+                    </div>
+                    <div className="mb-4">
+                      <p className="text-sm">
+                        <span className="text-primary font-semibold">{evangelho.referencia}</span>
+                      </p>
+                    </div>
+                    <div className={`${fontSize}`}>
+                      {!isPaixao && <p className="mb-4">— Glória a vós, Senhor.</p>}
 
-                      {evangelho.texto.split('\n').map((i) => (
-                        <p key={i} className="leading-relaxed whitespace-pre-line">
-                          {evangelho.texto}
-                        </p>
-                      ))}
+                      <div className="space-y-3 mt-4">
+                        {evangelho.texto.split('\n').map((paragrafo, i) => {
+                          const trimmed = paragrafo.trim();
+                          if (!trimmed) return null;
+                          const match = trimmed.match(/^(\d+(?:,\d+)?(?:-\d+)?(?:[a-z])?)\s*(.*)/);
+                          if (match) {
+                            const [, numero, texto] = match;
+                            return (
+                              <div key={i} className="flex">
+                                <span className="text-primary font-semibold mr-3 flex-shrink-0">{numero}</span>
+                                <p className="leading-relaxed">{texto}</p>
+                              </div>
+                            );
+                          }
+                          return (
+                            <p key={i} className="leading-relaxed">{trimmed}</p>
+                          );
+                        })}
+                      </div>
 
                       <p className="mt-4 font-semibold">— Palavra da Salvação.</p>
                       <p>— Glória a vós, Senhor.</p>
