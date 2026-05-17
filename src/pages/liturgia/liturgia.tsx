@@ -5,10 +5,15 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { CorLiturgica, LiturgiaDiaResponse } from "@/interfaces/liturgiaTypes";
 import { cn } from "@/lib/utils";
+import {
+  ANTIFONA_DE_COMUNHAO,
+  ORACAO_DEPOIS_DA_COMUNHAO,
+} from "@/lib/liturgiaLabels";
+import { normalizeLiturgiaResponse } from "@/lib/normalizeLiturgiaResponse";
 import { getLiturgicDay } from "@/services/getLiturgicApi";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { CalendarIcon, Share2 } from "lucide-react";
+import { CalendarIcon, FileDown, Share2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -19,7 +24,11 @@ function Liturgia() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [liturgiaData, setLiturgiaData] = useState<LiturgiaDiaResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const isVigiliaPascal = liturgiaData?.liturgia === 'Sábado Santo - Vigília Pascal'
+  const temRitoComunhao = Boolean(
+    liturgiaData?.antifonas?.comunhao || liturgiaData?.oracoes.comunhao,
+  )
 
   const corClasses: Record<CorLiturgica, string> = {
     Verde: 'bg-green-100 text-green-800',
@@ -45,6 +54,47 @@ function Liturgia() {
     setFontSize(prev => prev === "text-xl" ? "text-lg" : "text-base")
   }
 
+  async function handleDownloadPdf() {
+    if (!selectedDate) {
+      toast.error("Selecione uma data para gerar o PDF.");
+      return;
+    }
+
+    setIsGeneratingPdf(true);
+
+    let data = liturgiaData;
+
+    if (!data) {
+      const dia = String(selectedDate.getDate()).padStart(2, "0");
+      const mes = String(selectedDate.getMonth() + 1).padStart(2, "0");
+      const ano = String(selectedDate.getFullYear());
+      data = await getLiturgicDay(dia, mes, ano);
+
+      if (!data) {
+        toast.error("Não há liturgia disponível para gerar o PDF nesta data.");
+        setIsGeneratingPdf(false);
+        return;
+      }
+
+      data = normalizeLiturgiaResponse(data);
+      setLiturgiaData(data);
+    }
+
+    try {
+      const { generateLiturgiaPdf } = await import(
+        "@/lib/liturgiaPdf/generateLiturgiaPdf"
+      );
+      await generateLiturgiaPdf(data, selectedDate);
+      toast.success("PDF gerado com sucesso.");
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Não foi possível gerar o PDF.";
+      toast.error(message);
+    } finally {
+      setIsGeneratingPdf(false);
+    }
+  }
+
   useEffect(() => {
     if (copied) {
       toast.success("Link copiado!");
@@ -58,48 +108,53 @@ function Liturgia() {
     const mesParam = searchParams.get("mes");
     const anoParam = searchParams.get("ano");
 
-    const dia = diaParam || String(new Date().getDate()).padStart(2, "0");
-    const mes = mesParam || String(new Date().getMonth() + 1).padStart(2, "0");
-    const ano = anoParam || String(new Date().getFullYear());
+    if (!diaParam || !mesParam || !anoParam) return;
 
-    const dateFromParams = new Date(Number(ano), Number(mes) - 1, Number(dia));
+    const dateFromParams = new Date(
+      Number(anoParam),
+      Number(mesParam) - 1,
+      Number(diaParam),
+    );
 
-    if (!isNaN(dateFromParams.getTime())) {
-      setSelectedDate(dateFromParams);
-    }
+    if (isNaN(dateFromParams.getTime())) return;
+
+    setSelectedDate((prev) => {
+      if (prev?.getTime() === dateFromParams.getTime()) return prev;
+      return dateFromParams;
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!selectedDate) return;
+
+    const dia = String(selectedDate.getDate()).padStart(2, "0");
+    const mes = String(selectedDate.getMonth() + 1).padStart(2, "0");
+    const ano = String(selectedDate.getFullYear());
+
+    const newUrl = `${window.location.pathname}?dia=${dia}&mes=${mes}&ano=${ano}`;
+    window.history.pushState({}, "", newUrl);
+
+    let cancelled = false;
 
     const fetchData = async () => {
       setIsLoading(true);
       const data = await getLiturgicDay(dia, mes, ano);
+
+      if (cancelled) return;
+
       if (!data) {
         toast.error("A liturgia desta data ainda não está disponível nesse site");
       }
-      setLiturgiaData(data);
+
+      setLiturgiaData(data ? normalizeLiturgiaResponse(data) : null);
       setIsLoading(false);
     };
 
     fetchData();
-  }, []);
 
-  useEffect(() => {
-    if (selectedDate) {
-      const dia = String(selectedDate.getDate()).padStart(2, "0");
-      const mes = String(selectedDate.getMonth() + 1).padStart(2, "0");
-      const ano = String(selectedDate.getFullYear());
-
-      const newUrl = `${window.location.pathname}?dia=${dia}&mes=${mes}&ano=${ano}`;
-      window.history.pushState({}, "", newUrl);
-
-      const fetchData = async () => {
-        const data = await getLiturgicDay(dia, mes, ano);
-        if (!data) {
-          toast.error("A liturgia desta data ainda não está disponível nesse site");
-        }
-        setLiturgiaData(data);
-      };
-
-      fetchData();
-    }
+    return () => {
+      cancelled = true;
+    };
   }, [selectedDate]);
 
   return (
@@ -122,6 +177,17 @@ function Liturgia() {
               className="text-sm px-2 py-1 border rounded cursor-pointer"
             >
               A+
+            </button>
+
+            <button
+              type="button"
+              onClick={handleDownloadPdf}
+              disabled={isLoading || !liturgiaData || isGeneratingPdf}
+              className="text-sm px-2 py-1 border rounded cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              aria-label="Baixar PDF da liturgia"
+              title="Baixar PDF da liturgia"
+            >
+              <FileDown size={16} />
             </button>
 
             <Dialog open={open} onOpenChange={setOpen}>
@@ -199,6 +265,10 @@ function Liturgia() {
           <div className="h-4 bg-gray-200/50 rounded w-full" />
           <div className="h-4 bg-gray-200/50 rounded w-11/12" />
         </div>
+      ) : !liturgiaData ? (
+        <p className="text-muted-foreground italic">
+          A liturgia desta data ainda não está disponível.
+        </p>
       ) : (
         isVigiliaPascal ? (
           <Tabs defaultValue="exulte" className="w-full">
@@ -478,17 +548,25 @@ function Liturgia() {
                 </div>
               )}
 
-              {liturgiaData?.oracoes.comunhao && (
-                <div className="bg-muted/50 p-4 rounded-lg">
-                  <h3 className="text-sm font-semibold mb-2">Oração da Comunhão</h3>
-                  <p className="text-sm leading-relaxed whitespace-pre-line">{liturgiaData.oracoes.comunhao}</p>
-                </div>
-              )}
+              {(liturgiaData?.antifonas?.comunhao || liturgiaData?.oracoes.comunhao) && (
+                <div className="space-y-4 border-t border-dashed pt-6 mt-2">
+                  <p className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                    Rito da Comunhão
+                  </p>
 
-              {liturgiaData?.antifonas?.comunhao && (
-                <div className="bg-muted/50 p-4 rounded-lg">
-                  <h3 className="text-sm font-semibold mb-2">Antífona de Comunhão</h3>
-                  <p className="text-sm leading-relaxed whitespace-pre-line">{liturgiaData.antifonas.comunhao}</p>
+                  {liturgiaData?.antifonas?.comunhao && (
+                    <div className="bg-muted/50 p-4 rounded-lg">
+                      <h3 className="text-sm font-semibold mb-2">{ANTIFONA_DE_COMUNHAO}</h3>
+                      <p className="text-sm leading-relaxed whitespace-pre-line">{liturgiaData.antifonas.comunhao}</p>
+                    </div>
+                  )}
+
+                  {liturgiaData?.oracoes.comunhao && (
+                    <div className="bg-muted/50 p-4 rounded-lg">
+                      <h3 className="text-sm font-semibold mb-2">{ORACAO_DEPOIS_DA_COMUNHAO}</h3>
+                      <p className="text-sm leading-relaxed whitespace-pre-line">{liturgiaData.oracoes.comunhao}</p>
+                    </div>
+                  )}
                 </div>
               )}
             </TabsContent>
@@ -496,12 +574,20 @@ function Liturgia() {
         ) : (
           <Tabs defaultValue="primeira" className="w-full">
             <div className="flex justify-between items-center mb-4 text-2xl md:text-lg">
-              <TabsList className="grid grid-cols-5 gap-1 w-full">
+              <TabsList
+                className={cn(
+                  "grid gap-1 w-full",
+                  temRitoComunhao ? "grid-cols-6" : "grid-cols-5",
+                )}
+              >
                 <TabsTrigger className="text-xs md:text-sm" value="oracoes">Orações</TabsTrigger>
                 <TabsTrigger className="text-xs md:text-sm" value="primeira">1ª Leitura</TabsTrigger>
                 <TabsTrigger className="text-xs md:text-sm" value="salmo">Salmo</TabsTrigger>
                 <TabsTrigger className="text-xs md:text-sm" value="segunda">2ª Leitura</TabsTrigger>
                 <TabsTrigger className="text-xs md:text-sm" value="evangelho">Evangelho</TabsTrigger>
+                {temRitoComunhao && (
+                  <TabsTrigger className="text-xs md:text-sm" value="comunhao">Comunhão</TabsTrigger>
+                )}
               </TabsList>
             </div>
 
@@ -513,10 +599,6 @@ function Liturgia() {
               <div>
                 <h3 className="text-lg font-semibold mb-1">Oferendas</h3>
                 <p className="leading-relaxed">{liturgiaData?.oracoes.oferendas}</p>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold mb-1">Comunhão</h3>
-                <p className="leading-relaxed">{liturgiaData?.oracoes.comunhao}</p>
               </div>
               {liturgiaData?.oracoes.extras?.map((extra, index) => (
                 <div key={index}>
@@ -750,6 +832,30 @@ function Liturgia() {
                 );
               })}
             </TabsContent>
+
+            {temRitoComunhao && (
+              <TabsContent value="comunhao" className={`${fontSize} space-y-6`}>
+                <div className="bg-muted/50 border-l-4 border-primary px-4 py-3 rounded-r-lg">
+                  <p className="text-sm font-semibold text-muted-foreground">
+                    Rito da Comunhão — após a Oração Eucarística e a distribuição do Corpo e Sangue de Cristo.
+                  </p>
+                </div>
+
+                {liturgiaData?.antifonas?.comunhao && (
+                  <div>
+                    <h3 className="text-lg font-semibold mb-1">{ANTIFONA_DE_COMUNHAO}</h3>
+                    <p className="leading-relaxed whitespace-pre-line">{liturgiaData.antifonas.comunhao}</p>
+                  </div>
+                )}
+
+                {liturgiaData?.oracoes.comunhao && (
+                  <div>
+                    <h3 className="text-lg font-semibold mb-1">{ORACAO_DEPOIS_DA_COMUNHAO}</h3>
+                    <p className="leading-relaxed whitespace-pre-line">{liturgiaData.oracoes.comunhao}</p>
+                  </div>
+                )}
+              </TabsContent>
+            )}
           </Tabs>
         )
       )}
